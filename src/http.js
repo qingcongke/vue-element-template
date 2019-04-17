@@ -1,10 +1,55 @@
 import axios from "axios";
 import { Message, Loading } from "element-ui";
+import QS from "qs";
 import router from "./router";
 
-axios.defaults.baseURL = "http://h5.020db9fb810c.com/cps/";
+import urlPrefix from "../server";
+
+let domain = window.location.host.split(":")[0];
+console.log(domain);
+axios.defaults.baseURL = urlPrefix.dev;
+
+sessionStorage.setItem("baseUrl", urlPrefix.dev);
+
+// if (domain == "localhost" || domain == "127.0.0.1") {
+//   console.log("本地运行！");
+
+//   axios.defaults.baseURL = urlPrefix.dev;
+//   Vue.prototype.domain = urlPrefix.dev;
+//   sessionStorage.setItem("baseUrl", urlPrefix.dev);
+// } else {
+//   console.log("读取/server.json");
+//   let getDomain = "";
+//   //获取获取服务器的域名1
+
+//   (async () => {
+//     getDomain = await new Promise((resolve, reject) => {
+//       axios
+//         .get(
+//           //"http://conf.p1000y.com/?app=zhanshen",
+//           "./server.json"
+//         )
+//         .then(response => {
+//           resolve(response.data);
+//         });
+//     });
+//     axios.defaults.withCredentials = true;
+//     getDomain = getDomain.os_server;
+
+//     sessionStorage.setItem("baseUrl", getDomain);
+
+//     axios.defaults.baseURL = getDomain;
+//     Vue.prototype.domain = getDomain;
+//   })();
+
+//   console.log(".....");
+//   console.log(getDomain);
+// }
 
 axios.defaults.withCredentials = true;
+axios.defaults.timeout = 10000;
+axios.defaults.headers.post["Content-Type"] =
+  "application/x-www-form-urlencoded;charset=UTF-8";
 
 let loading;
 //开始加载动画
@@ -46,16 +91,22 @@ axios.interceptors.response.use(
     endLoading();
 
     let data = response.data;
-    if (data.code == 200) {
-      Message.success(data.msg);
-    }
 
+    if (data.code == 400) {
+      Message.error("Session 失效，请重新登录");
+
+      console.log(data.msg);
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      this.$router.push("/login");
+      window.location.reload();
+    }
     if (data.code == 500) {
       Message.error(data.msg);
       console.log(data.msg);
     }
 
-    return response;
+    return response.data;
   },
   error => {
     //结束动画

@@ -5,7 +5,8 @@ Vue.use(Vuex);
 
 const state = {
   token: "",
-  auth: ""
+  auth: "",
+  isCollapse: false
 };
 
 const getters = {
@@ -20,6 +21,9 @@ const mutations = {
   },
   isAuth(state, auth) {
     state.auth = auth;
+  },
+  switchNav(state, type) {
+    state.isCollapse = type;
   }
 };
 

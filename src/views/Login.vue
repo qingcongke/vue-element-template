@@ -65,14 +65,13 @@ export default {
               "/"
           )
             .then(res => {
-              let userInfo = res.data.result[0];
+              let userInfo = res.result[0];
               localStorage.setItem("username", userInfo.username);
               localStorage.setItem("level", userInfo.level);
               this.$store.commit("isAuth", userInfo.auth);
-
               this.$store.commit("isToken", (Math.random() + "").slice(2));
-
               this.autoAddRoutes();
+              this.$router.push("/account");
             })
             .catch(err => {});
         } else {

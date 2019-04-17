@@ -71,12 +71,19 @@ allRoutes: [
 
 //路由守卫
 router.beforeEach((to, from, next) => {
-  // const eleToken = localStorage.eleToken ? true : false;
+  if (to.path == "/") {
+    next("/login");
+  } else {
+    if (to.matched.length === 0) {
+      next({
+        path: "/404" //跳转错误页面
+      });
+    }
+  }
+
   if (to.path == "/login") {
     next();
   } else {
-    // localStorage.getItem("token") ? next() : next("/login");
-
     let token = store.state.token;
     let auth = store.state.auth;
     let username = localStorage.getItem("username");

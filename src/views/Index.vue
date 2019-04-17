@@ -5,7 +5,7 @@
         <vheader/>
       </el-header>
       <el-container>
-        <el-aside width="200px">
+        <el-aside class="aside" :style="menuWidth">
           <navmenu></navmenu>
         </el-aside>
         <el-main>
@@ -23,6 +23,25 @@ export default {
   components: {
     navmenu: NavMenu,
     vheader: Header
+  },
+  data: function() {
+    return {
+      menuWidth: "width:250px"
+    };
+  },
+  computed: {
+    getIsCollapse() {
+      return this.$store.state.isCollapse;
+    }
+  },
+  watch: {
+    getIsCollapse(val) {
+      if (val == false) {
+        this.menuWidth = "width:250px";
+      } else {
+        this.menuWidth = "width:65px";
+      }
+    }
   }
 };
 </script>
@@ -31,5 +50,8 @@ export default {
   background-color: #409eff;
   color: #fff;
   line-height: 60px;
+}
+.aside {
+  height: 100vh;
 }
 </style>
