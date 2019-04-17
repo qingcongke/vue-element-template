@@ -30,7 +30,7 @@
 <script>
 import qs from "qs";
 import routes from "@/auto_router";
-import { truncate } from "fs";
+import { truncate, truncateSync } from "fs";
 export default {
   data: function() {
     return {
@@ -55,7 +55,6 @@ export default {
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
-        console.log(formName);
         if (valid) {
           let params = qs.stringify(this.ruleForm);
           this.$http(
@@ -70,16 +69,13 @@ export default {
               localStorage.setItem("username", userInfo.username);
               localStorage.setItem("level", userInfo.level);
               this.$store.commit("isAuth", userInfo.auth);
-              console.log(this.$store.state.auth);
-              this.$store.commit("isToken", (Math.random() + "").slice(2));
-              console.log(this.$store.state.token);
 
-              this.$router.push("/account");
+              this.$store.commit("isToken", (Math.random() + "").slice(2));
+
               this.autoAddRoutes();
             })
             .catch(err => {});
         } else {
-          console.log("error submit!!");
           return false;
         }
       });
@@ -87,32 +83,28 @@ export default {
     autoAddRoutes() {
       let auth = this.$store.state.auth;
 
-      if (auth != "all") {
-        alert("all");
+      if (auth == "all") {
         this.$router.addRoutes(routes);
         // this.$router不是响应式的，所以手动将路由元注入路由对象
         this.$router.options.routes.push(routes);
       } else {
         auth = auth.split(",");
 
-        auth = [];
+        auth = [1];
 
         for (let i = 0; i < routes.length; i++) {
           let index = 0;
-          console.log(routes[i].children);
+
           let children = routes[i].children.filter(function(val) {
-            console.log(val);
-            console.log(auth.indexOf(val.meta.tag));
-            return false;
+            return auth.indexOf(val.meta.tag) == -1 ? false : true;
           });
-          console.log(children);
+
           if (children.length == 0) {
             routes.splice(i, 1);
+          } else {
+            routes[i].children = children;
           }
         }
-
-        console.log(">>>>>>>>>>>>>>");
-        console.log(routes);
       }
     }
   }
